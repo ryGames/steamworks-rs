@@ -38,6 +38,7 @@ pub use crate::ugc::*;
 pub use crate::user::*;
 pub use crate::user_stats::*;
 pub use crate::utils::*;
+pub use crate::inventory::*;
 
 mod app;
 mod callback;
@@ -61,6 +62,7 @@ mod ugc;
 mod user;
 mod user_stats;
 mod utils;
+mod inventory;
 
 pub type SResult<T> = Result<T, SteamError>;
 
@@ -470,6 +472,18 @@ where
             networking_utils::NetworkingUtils {
                 utils,
                 inner: self.inner.clone(),
+            }
+        }
+    }
+
+    /// Returns an accessor to the steam inventory interface
+    pub fn inventory(&self) -> Inventory<Manager> {
+        unsafe {
+            let inventory = sys::SteamAPI_SteamInventory_v003();
+            debug_assert!(!inventory.is_null());
+            Inventory {
+                inventory,
+                _inner: self.inner.clone(),
             }
         }
     }
