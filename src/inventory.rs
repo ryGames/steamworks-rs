@@ -144,6 +144,17 @@ impl<Manager> Inventory<Manager> {
         }
     }
 
+    pub fn consume_item(&self, item_consume: sys::SteamItemInstanceID_t, quantity: u32) -> Result<sys::SteamInventoryResult_t, InventoryError> {
+        let mut result_handle = sys::k_SteamInventoryResultInvalid;
+        unsafe {
+            if sys::SteamAPI_ISteamInventory_ConsumeItem(self.inventory, &mut result_handle, item_consume, quantity) {
+                Ok(result_handle)
+            } else {
+                Err(InventoryError::OperationFailed)
+            }
+        }
+    }
+
     /// Retrieves all items in the user's Steam inventory.
     pub fn get_all_items(&self) -> Result<sys::SteamInventoryResult_t, InventoryError> {
         let mut result_handle = sys::k_SteamInventoryResultInvalid;
@@ -240,6 +251,8 @@ pub enum InventoryError {
     OperationFailed,
     #[error("Failed to trigger item drop")]
     TriggerItemDropFailed,
+    #[error("Failed to consume item")]
+    ConsumeItemFailed,
     #[error("Failed to retrieve result status")]
     GetResultStatusFailed,
     #[error("Failed to retrieve result items")]
