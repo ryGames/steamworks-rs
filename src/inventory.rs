@@ -155,6 +155,32 @@ impl<Manager> Inventory<Manager> {
         }
     }
 
+    pub fn exchange_items(
+        &self, 
+        output_ids: Vec<sys::SteamItemDef_t>, 
+        output_quantities: Vec<u32>, 
+        input_ids: Vec<sys::SteamItemInstanceID_t>, 
+        input_quantities: Vec<u32>
+    ) -> Result<sys::SteamInventoryResult_t, InventoryError> {
+        let mut result_handle = sys::k_SteamInventoryResultInvalid;
+        unsafe {
+            if sys::SteamAPI_ISteamInventory_ExchangeItems(
+                self.inventory,
+                &mut result_handle,
+                output_ids.as_ptr(),
+                output_quantities.as_ptr(),
+                output_ids.len() as u32,
+                input_ids.as_ptr(),
+                input_quantities.as_ptr(),
+                input_ids.len() as u32
+            ) {
+                Ok(result_handle)
+            } else {
+                Err(InventoryError::OperationFailed)
+            }
+        }
+    }
+
     /// Retrieves all items in the user's Steam inventory.
     pub fn get_all_items(&self) -> Result<sys::SteamInventoryResult_t, InventoryError> {
         let mut result_handle = sys::k_SteamInventoryResultInvalid;
