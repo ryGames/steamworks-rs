@@ -202,6 +202,8 @@ impl<Manager> Inventory<Manager> {
             );
             if status == sys::EResult::k_EResultOK {
                 Ok(status)
+            } else if status == sys::EResult::k_EResultPending {
+                Ok(status)
             } else {
                 Err(InventoryError::GetResultStatusFailed)
             }
